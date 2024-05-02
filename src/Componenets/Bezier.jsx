@@ -16,7 +16,9 @@ const BezierCurveCreator = ({
   setselectedidhover,
   onshape,
   setonshape,
-  showmode
+  showmode,
+  opacity,
+  setopacity
 }) => {
   
   useEffect(() => {
@@ -71,6 +73,7 @@ const BezierCurveCreator = ({
               stroke="red"
               strokeWidth={4}
               fill="lightblue"
+              opacity={shape.opacity}
               closed={true}
               tension={0.5}
               bezier={false}

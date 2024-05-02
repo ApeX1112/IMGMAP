@@ -247,7 +247,16 @@ export default function App() {
         return rec;
       }
     })
+    const newshapes=shapes.map(shape=>{
+      if(shape.id===selectedshape){
+        return {...shape,opacity:opacity};
+
+      }else{
+        return shape;
+      }
+    })
     setRectangles(newrects);
+    setShapes(newshapes);
   }
 
   function handlemouseenter(key){
@@ -316,7 +325,7 @@ export default function App() {
           id: uuidv4(),
           points: currentPoints,
           color: 'red',
-          opacity: 1,
+          opacity,
           text: ''
         };
         setShapes([...shapes, newShape]);
@@ -641,6 +650,8 @@ export default function App() {
               showmode={showmode}
               X={X}
               Y={Y}
+              opacity={opacity}
+              setopacity={setopacity}
               ></BezierCurveCreator>
 
             {rectangles.map((rectangle) => (
