@@ -18,7 +18,8 @@ const BezierCurveCreator = ({
   setonshape,
   showmode,
   opacity,
-  setopacity
+  setopacity,
+  fillColor,
 }) => {
   
   useEffect(() => {
@@ -72,7 +73,7 @@ const BezierCurveCreator = ({
               points={shape.points}
               stroke="red"
               strokeWidth={4}
-              fill="lightblue"
+              fill={shape.fillColor}
               opacity={shape.opacity}
               closed={true}
               tension={0.5}

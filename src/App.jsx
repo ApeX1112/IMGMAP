@@ -299,7 +299,15 @@ export default function App() {
         return rec;
       }
     })
-    setRectangles(newrects)
+    const newshapes=shapes.map(shape=>{
+      if(shape.id===selectedshape){
+        return {...shape,fillColor:fillColor};
+      }else{
+        return shape;
+      }
+    })
+    setRectangles(newrects);
+    setShapes(newshapes);
   }
 
 
@@ -326,6 +334,7 @@ export default function App() {
           points: currentPoints,
           color: 'red',
           opacity,
+          fillColor,
           text: ''
         };
         setShapes([...shapes, newShape]);
@@ -652,6 +661,7 @@ export default function App() {
               Y={Y}
               opacity={opacity}
               setopacity={setopacity}
+              fillColor={fillColor}
               ></BezierCurveCreator>
 
             {rectangles.map((rectangle) => (
