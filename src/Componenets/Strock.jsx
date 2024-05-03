@@ -24,7 +24,7 @@ const Strock = ({rectangles,setrectangles,selectedshape,shapes,setshapes}) => {
     })
     setshapes(newshapes)
     setrectangles(newrects)
-    console.log(strockwidth)
+    
   }
   function handlestrockcolor(e){
     setstrockcolor(e.target.value)

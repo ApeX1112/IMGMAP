@@ -234,6 +234,8 @@ export default function App() {
     setFillColor(color);
     const rect=rectangles.find(rect=>rect.id===key);
     setopacity(rect.Opacity);
+
+    
     
     
     
@@ -363,6 +365,17 @@ export default function App() {
     
 
   }
+  function deleteshape(e){
+    const newrects=rectangles.filter(rec=>rec.id!==selectedshape)
+    setRectangles(newrects)
+    const newshapes=shapes.filter(shape=>shape.id!==selectedshape)
+    setShapes(newshapes)
+    const newcercles=circles.filter(cir=>cir.id!==selectedshape)
+    setCircles(newcercles)
+    const newarrows=arrows.filter(arr=>arr.id!==selectedshape)
+    setArrows(newarrows)
+  }
+  
   
 
 /*-----------------------------------------------------
@@ -589,6 +602,8 @@ export default function App() {
             </button>
             <button onClick={handleCloseCurve}>Close Shape</button>
             <button onClick={()=>setAction(ACTIONS.BEZIER)}>BEZIER</button>
+            <button onClick={(e)=>deleteshape(e)}>DELETE</button>
+
 
           </div>
           <Strock 
@@ -691,6 +706,7 @@ export default function App() {
                 onClick={(e)=>onClick(e,rectangle.id,rectangle.fillColor)}
                 onMouseEnter={()=>handlemouseenter(rectangle.id)}
                 onMouseLeave={handlemouseleave}
+                
                 
                 
               />
