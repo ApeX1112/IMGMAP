@@ -71,8 +71,8 @@ const BezierCurveCreator = ({
             <Line
               key={shapes.indexOf(shape)}
               points={shape.points}
-              stroke="red"
-              strokeWidth={4}
+              stroke={shape.strockcolor}
+              strokeWidth={shape.strockwidth}
               fill={shape.fillColor}
               opacity={shape.opacity}
               closed={true}
@@ -113,7 +113,7 @@ const BezierCurveCreator = ({
                   newPoints[index + 1] = e.target.y();
                   setCurrentPoints(newPoints);
                 }}
-                onClick={()=>console.log(selectedid)}
+                
               />
             )
           ))}

@@ -19,6 +19,7 @@ import { useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { ACTIONS } from "./constants";
 import BezierCurveCreator from './Componenets/Bezier';
+import Strock from './Componenets/Strock';
 
 
 
@@ -103,6 +104,8 @@ export default function App() {
             fillColor,
             opacity,
             Text:'',
+            strockwidth:0,
+            strockcolor:'black',
           },
         ]);
         break;
@@ -335,7 +338,9 @@ export default function App() {
           color: 'red',
           opacity,
           fillColor,
-          text: ''
+          text: '',
+          strockwidth:0,
+          strockcolor:'black'
         };
         setShapes([...shapes, newShape]);
         setCurrentPoints([]); 
@@ -586,6 +591,13 @@ export default function App() {
             <button onClick={()=>setAction(ACTIONS.BEZIER)}>BEZIER</button>
 
           </div>
+          <Strock 
+            rectangles={rectangles}
+            setrectangles={setRectangles}
+            selectedshape={selectedshape}
+            shapes={shapes}
+            setshapes={setShapes}
+          ></Strock>
         </div>
         {/* Canvas */}
         <Stage
@@ -669,8 +681,8 @@ export default function App() {
                 key={rectangle.id}
                 x={rectangle.x}
                 y={rectangle.y}
-                stroke={strokeColor}
-                strokeWidth={2}
+                stroke={rectangle.strockcolor}
+                strokeWidth={rectangle.strockwidth}
                 fill={rectangle.fillColor}
                 opacity={rectangle.opacity}
                 height={rectangle.height}
