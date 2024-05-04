@@ -37,7 +37,7 @@ export default function App() {
   const [arrows, setArrows] = useState([]);
   const [scribbles, setScribbles] = useState([]);
 
-  const strokeColor = "#000";
+  const strokeColor = "#ff0000";
   const isPaining = useRef();
   const currentShapeId = useRef();
   const transformerRef = useRef();
@@ -61,6 +61,11 @@ export default function App() {
 
   const [shapes, setShapes] = useState([]);
   const [currentPoints, setCurrentPoints] = useState([]);
+
+  const [TextConfClicked,setTextConfClicked]=useState(false);
+  const [textpanelcolor,settextpanelcolor]=useState('#ff0000');
+  const [textpanelopacity,settextpanelopacity]=useState(0.5);
+  const [panelLine,setpanelLine]=useState(true);
 
   const handleImageUpload = event => {
     const file = event.target.files[0];
@@ -458,11 +463,11 @@ export default function App() {
         <>
         <div style={{
           position:'absolute',
-          left:`${rec.x+rec.width}px`,
-          top:`${rec.y}px`,
+          left:`${panelLine?rec.x+rec.width:X}px`,
+          top:`${panelLine?rec.y:Y}px`,
           padding:'10px',
-          background:'Black',
-          opacity:'50%',
+          background:`${textpanelcolor}`,
+          opacity:`${textpanelopacity}`,
           border:'1px solide black',
           borderRadius: '5px',
           zIndex:1000
@@ -479,7 +484,7 @@ export default function App() {
           pointerEvents:'none',
           zIndex:999
         }}>
-          <line x1={X} y1={Y} x2={rec.x + rec.width + 10} y2={rec.y} stroke="black"></line>
+          {panelLine && <line x1={X} y1={Y} x2={rec.x + rec.width + 10} y2={rec.y} stroke="black"></line>}
 
         </svg>
         
@@ -695,11 +700,17 @@ export default function App() {
             circles={circles}
             setCircles={setCircles}
           ></Strock>
-          <TextConf>
-
-
-
-
+          <TextConf
+          textpanelcolor={textpanelcolor}
+          textpanelopacity={textpanelopacity}
+          panelLine={panelLine}
+          setpanelLine={setpanelLine}
+          settextpanelcolor={settextpanelcolor}
+          settextpanelopacity={settextpanelopacity}
+          TextConfClicked={TextConfClicked}
+          setTextConfClicked={setTextConfClicked}
+          
+          >
           </TextConf>
         </div>
         {/* Canvas */}
