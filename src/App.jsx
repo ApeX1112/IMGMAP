@@ -384,9 +384,9 @@ export default function App() {
 
   function handletextchangebezier(e,shape){
     shapes.find(shap=>shap.id===shape.id).Text=e.target.value;
-    
-    
-
+  }
+  function handletextchangecir(e,circle){
+    circles.find(cir=>cir.id===circle.id).Text=e.target.value;
   }
   function deleteshape(e){
     const newrects=rectangles.filter(rec=>rec.id!==selectedshape)
@@ -479,6 +479,62 @@ export default function App() {
           zIndex:999
         }}>
           <line x1={X} y1={Y} x2={rec.x + rec.width + 10} y2={rec.y} stroke="black"></line>
+
+        </svg>
+        
+        </>:null
+
+        )
+
+        }
+        {showmode && circles.map(circle =>
+          <div className="hover-panel" style={{
+            display: 'block' ,
+            position: 'relative',
+            top: '10%', 
+            left: '10%', 
+            zIndex: 1000,
+            padding: '10px',
+            background: 'white',
+            border: '1px solid black',
+            borderRadius: '5px',
+          }}>
+            <div>
+              <label> Text: </label>
+              <input type='text'  onChange={(e)=>handletextchangecir(e,circle)}></input>
+            </div>
+            Shape ID: {circle.id}
+          </div>
+          )
+
+        }
+        {!showmode && onshape && circles.map(circle=>
+        circle.id===selectedshapehover? 
+        <>
+        <div style={{
+          position:'absolute',
+          left:`${circle.x+circle.radius}px`,
+          top:`${circle.y}px`,
+          padding:'10px',
+          background:'Black',
+          opacity:'50%',
+          border:'1px solide black',
+          borderRadius: '5px',
+          zIndex:1000
+
+        }}>
+          <p style={{color:'white'}}>{circle.Text}</p>
+        </div>
+        <svg style={{
+          position:'absolute',
+          left:'0',
+          top:'0',
+          width:'100%',
+          height:'100%',
+          pointerEvents:'none',
+          zIndex:999
+        }}>
+          <line x1={X} y1={Y} x2={circle.x + circle.radius + 10} y2={circle.y} stroke="black"></line>
 
         </svg>
         
@@ -752,7 +808,7 @@ export default function App() {
                 opacity={circle.opacity}
 
                 onClick={(e)=>onClick(e,circle.id,circle.fillColor)}
-                onMouseEnter={()=>handlemouseenter(rectangle.id)}
+                onMouseEnter={()=>handlemouseenter(circle.id)}
                 onMouseLeave={handlemouseleave}
               />
             ))}
