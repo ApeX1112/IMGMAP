@@ -120,6 +120,11 @@ export default function App() {
             y,
             radius: 20,
             fillColor,
+            opacity,
+            Text:'',
+            strockwidth:0,
+            strockcolor:'black',
+            
           },
         ]);
         break;
@@ -252,6 +257,15 @@ export default function App() {
         return rec;
       }
     })
+    const newcircles=circles.map(cir=>{
+      if(cir.id===selectedshape){
+        return {...cir,opacity:opacity};
+
+      }else{
+        return cir;
+      }
+    })
+
     const newshapes=shapes.map(shape=>{
       if(shape.id===selectedshape){
         return {...shape,opacity:opacity};
@@ -262,6 +276,7 @@ export default function App() {
     })
     setRectangles(newrects);
     setShapes(newshapes);
+    setCircles(newcircles);
   }
 
   function handlemouseenter(key){
@@ -304,6 +319,13 @@ export default function App() {
         return rec;
       }
     })
+    const newcircles=circles.map(cir=>{
+      if(cir.id===selectedshape){
+        return {...cir,fillColor:fillColor};
+      }else{
+        return cir;
+      }
+    })
     const newshapes=shapes.map(shape=>{
       if(shape.id===selectedshape){
         return {...shape,fillColor:fillColor};
@@ -313,6 +335,7 @@ export default function App() {
     })
     setRectangles(newrects);
     setShapes(newshapes);
+    setCircles(newcircles);
   }
 
 
@@ -612,6 +635,8 @@ export default function App() {
             selectedshape={selectedshape}
             shapes={shapes}
             setshapes={setShapes}
+            circles={circles}
+            setCircles={setCircles}
           ></Strock>
         </div>
         {/* Canvas */}
@@ -720,11 +745,15 @@ export default function App() {
                 radius={circle.radius}
                 x={circle.x}
                 y={circle.y}
-                stroke={strokeColor}
-                strokeWidth={2}
+                stroke={circle.strockcolor}
+                strokeWidth={circle.strockwidth}
                 fill={circle.fillColor}
                 draggable={isDraggable}
+                opacity={circle.opacity}
+
                 onClick={(e)=>onClick(e,circle.id,circle.fillColor)}
+                onMouseEnter={()=>handlemouseenter(rectangle.id)}
+                onMouseLeave={handlemouseleave}
               />
             ))}
             {arrows.map((arrow) => (

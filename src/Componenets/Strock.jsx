@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const Strock = ({rectangles,setrectangles,selectedshape,shapes,setshapes}) => {
+const Strock = ({rectangles,setrectangles,selectedshape,shapes,setshapes,circles,setCircles}) => {
   const [strock,setstrock]=useState(false)
   const [strockcolor,setstrockcolor]=useState()
   const [strockwidth,setstrockwidth]=useState(0)
@@ -22,6 +22,14 @@ const Strock = ({rectangles,setrectangles,selectedshape,shapes,setshapes}) => {
             return shape
         }
     })
+    const newcircles=circles.map(cir=>{
+        if(cir.id===selectedshape){
+            return {...cir,strockwidth:strockwidth}
+        }else{
+            return cir
+        }
+    })
+    setCircles(newcircles)
     setshapes(newshapes)
     setrectangles(newrects)
     
@@ -43,6 +51,14 @@ const Strock = ({rectangles,setrectangles,selectedshape,shapes,setshapes}) => {
             return shape
         }
     })
+    const newcircles=circles.map(cir=>{
+        if(cir.id===selectedshape){
+            return {...cir,strockcolor:strockcolor}
+        }else{
+            return cir
+        }
+    })
+    setCircles(newcircles)
     setshapes(newshapes)
     setrectangles(newrects)
   }
