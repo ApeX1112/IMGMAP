@@ -37,7 +37,7 @@ export default function App() {
   const [arrows, setArrows] = useState([]);
   const [scribbles, setScribbles] = useState([]);
 
-  const strokeColor = "#ff0000";
+  const strokeColor = "black";
   const isPaining = useRef();
   const currentShapeId = useRef();
   const transformerRef = useRef();
@@ -63,7 +63,7 @@ export default function App() {
   const [currentPoints, setCurrentPoints] = useState([]);
 
   const [TextConfClicked,setTextConfClicked]=useState(false);
-  const [textpanelcolor,settextpanelcolor]=useState('#ff0000');
+  const [textpanelcolor,settextpanelcolor]=useState('black');
   const [textpanelopacity,settextpanelopacity]=useState(0.5);
   const [panelLine,setpanelLine]=useState(true);
 

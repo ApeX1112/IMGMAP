@@ -1,0 +1,5 @@
+react-konva
+use-image
+react-icons
+uuid
+react-router-dom@6
