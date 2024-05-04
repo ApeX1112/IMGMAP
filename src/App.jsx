@@ -20,6 +20,7 @@ import { v4 as uuidv4 } from "uuid";
 import { ACTIONS } from "./constants";
 import BezierCurveCreator from './Componenets/Bezier';
 import Strock from './Componenets/Strock';
+import TextConf from './Componenets/TextConf';
 
 
 
@@ -591,7 +592,7 @@ export default function App() {
             pointerEvents:'none',
             zIndex:999
           }}>
-         <line x1={X} y1={Y} x2={shape.x+shape.width+10} y2={shape.y} stroke="black"></line>y*/
+         <line x1={X} y1={Y} x2={shape.x+shape.width+10} y2={shape.y} stroke="black"></line>
 
           </svg>
         
@@ -694,6 +695,12 @@ export default function App() {
             circles={circles}
             setCircles={setCircles}
           ></Strock>
+          <TextConf>
+
+
+
+
+          </TextConf>
         </div>
         {/* Canvas */}
         <Stage
