@@ -23,12 +23,13 @@ import { ACTIONS } from "./constants";
 import BezierCurveCreator from '../Componenets/Bezier';
 import Strock from '../Componenets/Strock';
 import TextConf from '../Componenets/TextConf';
+import '../App.css'
 
 const Imgmap = () => {
     const [image, setImage] = useState(null);
     const [konvaImage] = useImage(image);
   
-    const stageRef = useRef();
+    const [stageRefs, setStageRefs] = useState([[React.createRef()]]);
     const [action, setAction] = useState(ACTIONS.SELECT);
     const [fillColor, setFillColor] = useState("#ff0000");
     const [rectangles, setRectangles] = useState([]);
@@ -86,10 +87,11 @@ const Imgmap = () => {
     }
   
   
-    function onPointerDown() {
+    function onPointerDown(index) {
+      
       if (action === ACTIONS.SELECT) return;
   
-      const stage = stageRef.current;
+      const stage = stageRefs[index].current;
       const { x, y } = stage.getPointerPosition();
       const id = uuidv4();
   
@@ -102,6 +104,7 @@ const Imgmap = () => {
             ...rectangles,
             {
               id,
+              stageid:currentIndex,
               x,
               y,
               height: 20,
@@ -159,10 +162,10 @@ const Imgmap = () => {
           break;
       }
     }
-    function onPointerMove() {
+    function onPointerMove(index) {
       if (action === ACTIONS.SELECT || !isPaining.current) return;
   
-      const stage = stageRef.current;
+      const stage = stageRefs[index].current;
       const { x, y } = stage.getPointerPosition();
   
       switch (action) {
@@ -225,7 +228,7 @@ const Imgmap = () => {
     function onPointerUp() {
       isPaining.current = false;
     }
-  
+  /*error in exporting */ 
     function handleExport() {
       const uri = stageRef.current.toDataURL();
       var link = document.createElement("a");
@@ -235,6 +238,7 @@ const Imgmap = () => {
       link.click();
       document.body.removeChild(link);
     }
+    
   
     function onClick(e,key,color) {
       if (action !== ACTIONS.SELECT) return;
@@ -407,8 +411,38 @@ const Imgmap = () => {
       setArrows(newarrows)
     }
     
-    
+    const [stages, setStages] = useState([{ id: 1 }]);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const containerRef = useRef(null);
+    const STAGE_WIDTH = 2000;
+    const STAGE_HEIGHT = 400;
+    const addStage = () => {
+      const newStage = { id: stages.length + 1 };
+      setStages([...stages, newStage]);
+      setCurrentIndex(stages.length);
+      
+      showStage(stages.length);
+      setStageRefs((prevStageRefs) => [...prevStageRefs, React.createRef()]);
+      console.log(stageRefs);
+    };
   
+    const showStage = (index) => {
+      containerRef.current.style.transform = `translateX(-${index * STAGE_WIDTH}px)`;
+    };
+  
+    const prevStage = () => {
+      if (currentIndex > 0) {
+        setCurrentIndex(currentIndex - 1);
+        showStage(currentIndex - 1);
+      }
+    };
+  
+    const nextStage = () => {
+      if (currentIndex < stages.length - 1) {
+        setCurrentIndex(currentIndex + 1);
+        showStage(currentIndex + 1);
+      }
+    };
   /*-----------------------------------------------------
   
   
@@ -718,153 +752,159 @@ const Imgmap = () => {
             >
             </TextConf>
           </div>
-          {/* Canvas */}
-          <Stage
-            ref={stageRef}
-            width={window.innerWidth}
-            height={window.innerHeight}
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={onPointerUp}
-            onMouseDown={action===ACTIONS.BEZIER?handleCanvasClick:null}
-          >
-            <Layer>
-  
-              
-              <Rect
-                x={0}
-                y={0}
-                height={window.innerHeight}
-                width={window.innerWidth}
-                fill="#ffffff"
-                id="bg"
-                onClick={() => {
-                  transformerRef.current.nodes([]);
-                }}
-              />
-              {konvaImage && (
-              <Image
-                  image={konvaImage}
-                  x={imageProperties.x}
-                  y={imageProperties.y}
-                  width={imageProperties.width}
-                  height={imageProperties.height}
-                  scaleX={imageProperties.scaleX}
-                  scaleY={imageProperties.scaleY}
-                  rotation={imageProperties.rotation}
-                  draggable={isImageDraggable===true}
-                  onClick={handleSelectImage}
-                  onDragEnd={(e) => {
-                      
-                      setImageProperties({
-                          ...imageProperties,
-                          x: e.target.x(),
-                          y: e.target.y(),
-                      });
-                      
-                  }}
-                  onTransformEnd={(e) => {
-                      const node = e.target;
-                      
-                      setImageProperties({
-                          ...imageProperties,
-                          scaleX: node.scaleX(),
-                          scaleY: node.scaleY(),
-                          rotation: node.rotation(),
-                      });
-                      
-                  }}
-              />
-          )}
-          
-              <BezierCurveCreator shapes={shapes}
-               transformerRef={transformerRef}
-                selectedid={selectedshape}
-                setselectedid={setselectedshape} 
-                currentPoints={currentPoints} 
-                setCurrentPoints={setCurrentPoints}
-                selectedidhover={selectedshapehover}
-                setselectedidhover={setselectedshapehover}
-                onshape={onshape}
-                setonshape={setonshape}
-                showmode={showmode}
-                X={X}
-                Y={Y}
-                opacity={opacity}
-                setopacity={setopacity}
-                fillColor={fillColor}
-                ></BezierCurveCreator>
-  
-              {rectangles.map((rectangle) => (
+          <div ref={containerRef} className='stage-container'>
+          {stageRefs.map((stageRef, index) => (
+            <Stage
+              key={index}
+              ref={stageRef}
+              width={2000}
+              height={window.innerHeight}
+              onPointerDown={()=>onPointerDown(index)}
+              onPointerMove={()=>onPointerMove(index)}
+              onPointerUp={onPointerUp}
+              onMouseDown={action===ACTIONS.BEZIER?handleCanvasClick:null}
+            >
+              <Layer>
+    
+                
                 <Rect
-                  key={rectangle.id}
-                  x={rectangle.x}
-                  y={rectangle.y}
-                  stroke={rectangle.strockcolor}
-                  strokeWidth={rectangle.strockwidth}
-                  fill={rectangle.fillColor}
-                  opacity={rectangle.opacity}
-                  height={rectangle.height}
-                  width={rectangle.width}
-                  draggable={isDraggable}
-                  onClick={(e)=>onClick(e,rectangle.id,rectangle.fillColor)}
-                  onMouseEnter={()=>handlemouseenter(rectangle.id)}
-                  onMouseLeave={handlemouseleave}
-                  
-                  
-                  
+                  x={0}
+                  y={0}
+                  height={window.innerHeight}
+                  width={window.innerWidth}
+                  fill="#ffffff"
+                  id="bg"
+                  onClick={() => {
+                    transformerRef.current.nodes([]);
+                  }}
                 />
-              ))}
-  
-              
-  
-              {circles.map((circle) => (
-                <Circle
-                  key={circle.id}
-                  radius={circle.radius}
-                  x={circle.x}
-                  y={circle.y}
-                  stroke={circle.strockcolor}
-                  strokeWidth={circle.strockwidth}
-                  fill={circle.fillColor}
-                  draggable={isDraggable}
-                  opacity={circle.opacity}
-  
-                  onClick={(e)=>onClick(e,circle.id,circle.fillColor)}
-                  onMouseEnter={()=>handlemouseenter(circle.id)}
-                  onMouseLeave={handlemouseleave}
+                {konvaImage && (
+                <Image
+                    image={konvaImage}
+                    x={imageProperties.x}
+                    y={imageProperties.y}
+                    width={imageProperties.width}
+                    height={imageProperties.height}
+                    scaleX={imageProperties.scaleX}
+                    scaleY={imageProperties.scaleY}
+                    rotation={imageProperties.rotation}
+                    draggable={isImageDraggable===true}
+                    onClick={handleSelectImage}
+                    onDragEnd={(e) => {
+                        
+                        setImageProperties({
+                            ...imageProperties,
+                            x: e.target.x(),
+                            y: e.target.y(),
+                        });
+                        
+                    }}
+                    onTransformEnd={(e) => {
+                        const node = e.target;
+                        
+                        setImageProperties({
+                            ...imageProperties,
+                            scaleX: node.scaleX(),
+                            scaleY: node.scaleY(),
+                            rotation: node.rotation(),
+                        });
+                        
+                    }}
                 />
-              ))}
-              {arrows.map((arrow) => (
-                <Arrow
-                  key={arrow.id}
-                  points={arrow.points}
-                  stroke={strokeColor}
-                  strokeWidth={2}
-                  fill={arrow.fillColor}
-                  draggable={isDraggable}
-                  onClick={(e)=>onClick(e,arrow.id,arrow.fillColor)}
-                />
-              ))}
-  
-              {scribbles.map((scribble) => (
-                <Line
-                  key={scribble.id}
-                  lineCap="round"
-                  lineJoin="round"
-                  points={scribble.points}
-                  stroke={strokeColor}
-                  strokeWidth={2}
-                  fill={scribble.fillColor}
-                  draggable={isDraggable}
-                  onClick={(e)=>onClick(e,scribble.id,scribble.fillColor)}
-                />
-              ))}
-  
-              <Transformer ref={transformerRef} />
-            </Layer>
-          </Stage>
-          
+            )}
+            
+                <BezierCurveCreator shapes={shapes}
+                transformerRef={transformerRef}
+                  selectedid={selectedshape}
+                  setselectedid={setselectedshape} 
+                  currentPoints={currentPoints} 
+                  setCurrentPoints={setCurrentPoints}
+                  selectedidhover={selectedshapehover}
+                  setselectedidhover={setselectedshapehover}
+                  onshape={onshape}
+                  setonshape={setonshape}
+                  showmode={showmode}
+                  X={X}
+                  Y={Y}
+                  opacity={opacity}
+                  setopacity={setopacity}
+                  fillColor={fillColor}
+                  ></BezierCurveCreator>
+    
+                {rectangles.filter((rec)=>rec.stageid===currentIndex).map((rectangle) => (
+                  <Rect
+                    key={rectangle.id}
+                    x={rectangle.x}
+                    y={rectangle.y}
+                    stroke={rectangle.strockcolor}
+                    strokeWidth={rectangle.strockwidth}
+                    fill={rectangle.fillColor}
+                    opacity={rectangle.opacity}
+                    height={rectangle.height}
+                    width={rectangle.width}
+                    draggable={isDraggable}
+                    onClick={(e)=>onClick(e,rectangle.id,rectangle.fillColor)}
+                    onMouseEnter={()=>handlemouseenter(rectangle.id)}
+                    onMouseLeave={handlemouseleave}
+                    
+                    
+                    
+                  />
+                ))}
+    
+                
+    
+                {circles.map((circle) => (
+                  <Circle
+                    key={circle.id}
+                    radius={circle.radius}
+                    x={circle.x}
+                    y={circle.y}
+                    stroke={circle.strockcolor}
+                    strokeWidth={circle.strockwidth}
+                    fill={circle.fillColor}
+                    draggable={isDraggable}
+                    opacity={circle.opacity}
+    
+                    onClick={(e)=>onClick(e,circle.id,circle.fillColor)}
+                    onMouseEnter={()=>handlemouseenter(circle.id)}
+                    onMouseLeave={handlemouseleave}
+                  />
+                ))}
+                {arrows.map((arrow) => (
+                  <Arrow
+                    key={arrow.id}
+                    points={arrow.points}
+                    stroke={strokeColor}
+                    strokeWidth={2}
+                    fill={arrow.fillColor}
+                    draggable={isDraggable}
+                    onClick={(e)=>onClick(e,arrow.id,arrow.fillColor)}
+                  />
+                ))}
+    
+                {scribbles.map((scribble) => (
+                  <Line
+                    key={scribble.id}
+                    lineCap="round"
+                    lineJoin="round"
+                    points={scribble.points}
+                    stroke={strokeColor}
+                    strokeWidth={2}
+                    fill={scribble.fillColor}
+                    draggable={isDraggable}
+                    onClick={(e)=>onClick(e,scribble.id,scribble.fillColor)}
+                  />
+                ))}
+    
+                <Transformer ref={transformerRef} />
+              </Layer>
+            </Stage>
+          ))}
+        </div>
+        <button onClick={prevStage}>Previous</button>
+        <button onClick={nextStage}>Next</button>
+        <button onClick={addStage}>Add Stage</button>
   
           
         </div>
