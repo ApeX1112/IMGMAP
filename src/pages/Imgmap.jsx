@@ -15,7 +15,7 @@ import {
   Rect,
   Stage,
   Transformer,
-  Image,
+  Image as KonvaImage,
 } from "react-konva";
 import { useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -26,8 +26,9 @@ import TextConf from '../Componenets/TextConf';
 import '../App.css'
 
 const Imgmap = () => {
-    const [image, setImage] = useState(null);
-    const [konvaImage] = useImage(image);
+  const [images, setImages] = useState([]);
+  const [imageProperties, setImageProperties] = useState([]);
+  const [konvaImages, setKonvaImages] = useState([]);
   
     const [stageRefs, setStageRefs] = useState([[React.createRef()]]);
     const [action, setAction] = useState(ACTIONS.SELECT);
@@ -47,7 +48,7 @@ const Imgmap = () => {
   
     const [opacity,setopacity]=useState(1)
   
-    const [imageProperties, setImageProperties] = useState({ x: 50, y: 50, width: 200, height: 200, scaleX: 1, scaleY: 1, rotation: 0 });
+    
     const [onshape,setonshape]=useState(false)
     
     const isImageDraggable = action===ACTIONS.SELECT
@@ -67,25 +68,58 @@ const Imgmap = () => {
     const [textpanelopacity,settextpanelopacity]=useState(0.5);
     const [panelLine,setpanelLine]=useState(true);
   
-    const handleImageUpload = event => {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImage(e.target.result);
-        setImageProperties({ ...imageProperties, x: 50, y: 50, width: 200, height: 200, rotation: 0 });
-      };
-      reader.readAsDataURL(file);
+    const handleImageUpload = (event) => {
+      const files = event.target.files;
+      const newImages = [];
+      const newImageProperties = [];
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new window.Image();
+          img.src = e.target.result;
+          img.onload = () => {
+            newImages.push(img);
+            newImageProperties.push({ x: 50, y: 50, width: 200, height: 200, scaleX: 1, scaleY: 1, rotation: 0 });
+            if (newImages.length === files.length) {
+              setImages(prevImages => [...prevImages, ...e.target.result]);
+              setKonvaImages(prevKonvaImages => [...prevKonvaImages, ...newImages]);
+              setImageProperties(prevProps => [...prevProps, ...newImageProperties]);
+            }
+          };
+        };
+        reader.readAsDataURL(file);
+      });
     };
   
-    const handleSelectImage = (e) => {
-      if (isImageDraggable){
-        if (transformerRef.current) {
-          transformerRef.current.nodes([e.target]);
-          transformerRef.current.getLayer().batchDraw();
-        }
-      }
-    }
+    const handleDragEnd = (index, e) => {
+      const newImageProperties = [...imageProperties];
+      newImageProperties[index] = {
+        ...newImageProperties[index],
+        x: e.target.x(),
+        y: e.target.y(),
+      };
+      setImageProperties(newImageProperties);
+    };
   
+    const handleTransformEnd = (index, e) => {
+      const node = e.target;
+      const newImageProperties = [...imageProperties];
+      newImageProperties[index] = {
+        ...newImageProperties[index],
+        scaleX: node.scaleX(),
+        scaleY: node.scaleY(),
+        rotation: node.rotation(),
+      };
+      setImageProperties(newImageProperties);
+    };
+    const handleSelectImage = (e) => {
+      
+      if (transformerRef.current) {
+        transformerRef.current.nodes([e.target]);
+        transformerRef.current.getLayer().batchDraw();
+      }
+      
+    }
   
     function onPointerDown(index) {
       
@@ -778,40 +812,23 @@ const Imgmap = () => {
                     transformerRef.current.nodes([]);
                   }}
                 />
-                {konvaImage && (
-                <Image
-                    image={konvaImage}
-                    x={imageProperties.x}
-                    y={imageProperties.y}
-                    width={imageProperties.width}
-                    height={imageProperties.height}
-                    scaleX={imageProperties.scaleX}
-                    scaleY={imageProperties.scaleY}
-                    rotation={imageProperties.rotation}
-                    draggable={isImageDraggable===true}
-                    onClick={handleSelectImage}
-                    onDragEnd={(e) => {
-                        
-                        setImageProperties({
-                            ...imageProperties,
-                            x: e.target.x(),
-                            y: e.target.y(),
-                        });
-                        
-                    }}
-                    onTransformEnd={(e) => {
-                        const node = e.target;
-                        
-                        setImageProperties({
-                            ...imageProperties,
-                            scaleX: node.scaleX(),
-                            scaleY: node.scaleY(),
-                            rotation: node.rotation(),
-                        });
-                        
-                    }}
-                />
-            )}
+                {konvaImages.map((image, index) => (
+            <KonvaImage
+              key={index}
+              image={image}
+              x={imageProperties[index].x}
+              y={imageProperties[index].y}
+              width={imageProperties[index].width}
+              height={imageProperties[index].height}
+              scaleX={imageProperties[index].scaleX}
+              scaleY={imageProperties[index].scaleY}
+              rotation={imageProperties[index].rotation}
+              draggable
+              onDragEnd={(e) => handleDragEnd(index, e)}
+              onTransformEnd={(e) => handleTransformEnd(index, e)}
+              onClick={handleSelectImage}
+            />
+          ))}
             
                 <BezierCurveCreator shapes={shapes}
                 transformerRef={transformerRef}
